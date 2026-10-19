@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Шпора по Информатике — Жидкое Стекло</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #0b0f19 0%, #1e1b4b 50%, #311068 100%);
+            background-attachment: fixed;
+            color: #ffffff;
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .glass-container {
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(30px) saturate(210%);
+            -webkit-backdrop-filter: blur(30px) saturate(210%);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 24px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3), inset 0 1px 2px rgba(255, 255, 255, 0.3);
+            padding: 25px;
+            max-width: 450px;
+            width: 100%;
+            box-sizing: border-box;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 22px;
+            margin: 0 0 5px 0;
+            background: linear-gradient(120deg, #ffffff, #cbd5e1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 20px;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            color: #fff;
+            font-size: 16px;
+            outline: none;
+            text-align: center;
+            box-sizing: border-box;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: rgba(255, 255, 255, 0.4);
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .result-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 12px;
+        }
+
+        .label {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.4);
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .val {
+            font-size: 18px;
+            font-weight: bold;
+            word-break: break-all;
+        }
+
+        /* Таблица шпаргалки */
+        .glass-table-box {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            max-width: 450px;
+            width: 100%;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        th {
+            padding: 8px;
+            color: rgba(255, 255, 255, 0.5);
+            font-weight: 500;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+        }
+
+        td {
+            padding: 8px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            transition: 0.2s;
+        }
+
+        /* Подсветка */
+        .highlight-row {
+            background: rgba(0, 255, 204, 0.2) !important;
+            color: #00ffcc;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="glass-container">
+        <h1>CheatCode: Информатика 8 класс</h1>
+        <div class="subtitle">Быстрый конвертер для контрольных</div>
+
+        <input type="number" id="calcInput" placeholder="Введи число из задания..." oninput="convertSystems()">
+
+        <div class="results-grid">
+            <div class="result-item"><div class="label">Двоичная (2)</div><div class="val" id="bOut">0</div></div>
+            <div class="result-item"><div class="label">Восьмеричная (8)</div><div class="val" id="oOut">0</div></div>
+            <div class="result-item"><div class="label">Десятичная (10)</div><div class="val" id="dOut">0</div></div>
+            <div class="result-item"><div class="label">Шестнадцатеричная (16)</div><div class="val" id="hOut">0</div></div>
+        </div>
+    </div>
+
+    <div class="glass-table-box">
+        <h2 style="font-size:14px; margin:0 0 10px 5px; color:rgba(255,255,255,0.7);">Шпаргалка: Степени двойки</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Степень</th>
+                    <th>Значение (Вес разряда)</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+            </tbody>
+        </table>
+    </div>
+
+<script>
+    const powers = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024];
+    const tBody = document.getElementById('tableBody');
+    
+    powers.forEach((val, index) => {
+        tBody.innerHTML += `<tr id="row-${val}"><td>2<sup>${index}</sup></td><td>${val}</td></tr>`;
+    });
+
+    function convertSystems() {
+        const val = document.getElementById('calcInput').value.trim();
+        const b = document.getElementById('bOut'), o = document.getElementById('oOut'), d = document.getElementById('dOut'), h = document.getElementById('hOut');
+
+        document.querySelectorAll('tr').forEach(tr => tr.classList.remove('highlight-row'));
+
+        if(val === "") {
+            b.innerText = "0"; o.innerText = "0"; d.innerText = "0"; h.innerText = "0";
+            return;
+        }
+
+        const num = parseInt(val, 10);
+        
+        // Безопасный перевод, если введено корректное число
+        if (!isNaN(num)) {
+            b.innerText = num.toString(2);
+            o.innerText = num.toString(8);
+            d.innerText = num.toString(10);
+            h.innerText = num.toString(16).toUpperCase();
+
+            if(powers.includes(num)) {
+                const row = document.getElementById(`row-${num}`);
+                if(row) row.classList.add('highlight-row');
+            }
+        }
+    }
+</script>
+</body>
+</html>
